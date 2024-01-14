@@ -11,6 +11,7 @@
           referrerpolicy="no-referrer" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" rel="stylesheet">
     <script src="main.js" type="module"></script>
+    <script type="module" src="tests.js"></script>
 </head>
 <body>
 
@@ -92,10 +93,10 @@
         <div class="columns">
             <div class="column">
                 <div class="field">
-                    <label class="label">Centre X du Cercle</label>
+                    <label class="label">Coin X du Rectangle</label>
                     <div class="control">
                         <input class="input"
-                               id="cx"
+                               id="x"
                                max="500"
                                min="1"
                                placeholder="250"
@@ -105,10 +106,10 @@
             </div>
             <div class="column">
                 <div class="field">
-                    <label class="label">Centre Y du Cercle</label>
+                    <label class="label">Coin Y du Rectangle</label>
                     <div class="control">
                         <input class="input"
-                               id="cy"
+                               id="y"
                                max="500"
                                min="1"
                                placeholder="250"
@@ -118,10 +119,10 @@
             </div>
             <div class="column">
                 <div class="field">
-                    <label class="label">Rayon du Cercle</label>
+                    <label class="label">Largeur du Rectangle</label>
                     <div class="control">
                         <input class="input"
-                               id="cr"
+                               id="width"
                                max="500"
                                min="1"
                                placeholder="100"
@@ -129,6 +130,19 @@
                     </div>
                 </div>
             </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label">Hauteur du Rectangle</label>
+                    <div class="control">
+                        <input class="input"
+                               id="height"
+                               max="500"
+                               min="1"
+                               placeholder="100"
+                               type="number">
+                    </div>
+                </div>
+            </div>            
             <div class="column">
                 <br>
                 <button class="button mt-2" id="draw-rectangle">Ajouter Rectangle</button>
@@ -145,10 +159,10 @@
         <div class="columns">
             <div class="column">
                 <div class="field">
-                    <label class="label">Centre X du Cercle</label>
+                    <label class="label">Coin X Boîte texte</label>
                     <div class="control">
                         <input class="input"
-                               id="cx"
+                               id="x"
                                max="500"
                                min="1"
                                placeholder="250"
@@ -158,10 +172,10 @@
             </div>
             <div class="column">
                 <div class="field">
-                    <label class="label">Centre Y du Cercle</label>
+                    <label class="label">Centre Y Boîte texte</label>
                     <div class="control">
                         <input class="input"
-                               id="cy"
+                               id="y"
                                max="500"
                                min="1"
                                placeholder="250"
@@ -171,20 +185,20 @@
             </div>
             <div class="column">
                 <div class="field">
-                    <label class="label">Rayon du Cercle</label>
+                    <label class="label">Texte</label>
                     <div class="control">
                         <input class="input"
-                               id="cr"
+                               id="text"
                                max="500"
                                min="1"
-                               placeholder="100"
-                               type="number">
+                               placeholder="Saisissez texte"
+                               type="text">
                     </div>
                 </div>
             </div>
             <div class="column">
                 <br>
-                <button class="button mt-2" id="draw-circle">Ajouter Cercle</button>
+                <button class="button mt-2" id="draw-text">Ajouter Texte</button>
             </div>
 
         </div>
