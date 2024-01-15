@@ -56,7 +56,7 @@ export class Circle{
     /**
      * @returns {Point} le point au centre au cercle
      */
-    getCenter(){
+    getPosition(){
         return this.#center;
     }
 
@@ -86,7 +86,7 @@ export class Circle{
     /**
      * @param {Point} center la nouvelle position du centre du cercle
      */    
-    setCenter(center){
+    setPosition(center){
         this.#center = center;
     }
 
@@ -100,18 +100,19 @@ export class Circle{
     /**
      * @return {Object} balise HTML <circle> (clé) et attributs (valeur)
      */
-    getHtmlTag(){
+    getHtmlStructure(){
         const attr = {
             cx: this.#center.getX(),
             cy: this.#center.getY(),
             r:  this.#radius,
             fill: `#${this.#color}`,
         };
-        return {"circle": attr};
+        return {"tag": "circle",
+                "attributes" : attr};
     }
 
     toString(){
-        return `Cercle(${ this.#radius }, ${ this.getCenter().getX() }, ${ this.getCenter().getY() })`;
+        return `Cercle(${ this.#radius }, ${ this.#center.getX() }, ${ this.#center.getY() })`;
     }
 }
 
@@ -131,7 +132,7 @@ export class Rectangle{
 
     /**
      *
-     * @param {Point} corner le point du coin supérieur du rectangle
+     * @param {Point} corner le point du coin supérieur gauche du rectangle
      * @param {number} width la largeur du rectangle
      * @param {number} height la hauteur du rectangle
      * @param {number} id l'id unique du rectangle.  C'est au
@@ -149,7 +150,7 @@ export class Rectangle{
     /**
      * @returns {Point} le point au coin supérieur gauche du rectangle
      */
-    getCorner(){
+    getPosition(){
         return this.#corner;
     }
 
@@ -187,7 +188,7 @@ export class Rectangle{
     /**
      * @param {Point} corner la nouvelle position du coin supérieur gauche du rectangle
      */
-    setCorner(corner){
+    setPosition(corner){
         this.#corner = corner;
     }
 
@@ -201,7 +202,7 @@ export class Rectangle{
     /**
  * @return {Object} balise HTML <rect> (clé) et attributs (valeur)
  */
-    getHtmlTag(){
+    getHtmlStructure(){
         const attr = {
             x: this.#corner.getX(),
             y: this.#corner.getY(),
@@ -209,11 +210,12 @@ export class Rectangle{
             height: this.#height,
             fill: `#${this.#color}`,
         };
-        return {"rect": attr};
+        return {"tag": "rect",
+                "attributes": attr};
     }
 
     toString(){
-        return `Rectangle(${ this.#width }, ${ this.#height }, ${ this.getCorner().getX() }, ${ this.getCorner().getY() })`;
+        return `Rectangle(${ this.#width }, ${ this.#height }, ${ this.#corner.getX() }, ${ this.#corner.getY() })`;
     }
 }
 
@@ -226,11 +228,12 @@ export class Rectangle{
 export class Text{
     #corner;
     #text;
+    #color;
     #id;
 
     /**
      *
-     * @param {Point} corner le point du coin supérieur de la boîte de teste
+     * @param {Point} corner le point du coin inférieur gauche de la boîte de texte
      * @param {string} text le libellé du texte
      * @param {number} id l'id unique du texte.  C'est au
      *         créateur de l'instance de s'assurer de l'unicité
@@ -239,21 +242,37 @@ export class Text{
     constructor(corner, text, id) {
         this.#corner = corner;
         this.#text = text;
+        this.#color = BLACK;
         this.#id = id;
     }
 
     /**
-     * @returns {Point} le point au coin supérieur gauche du texte
+     * @returns {Point} le point au coin inférieur gauche du texte
      */
-    getCorner(){
+    getPosition(){
         return this.#corner;
     }
 
     /**
     * @param {Point} corner la nouvelle position du coin supérieur gauche du texte
     */
-    setCorner(corner){
+    setPosition(corner){
         this.#corner = corner;
+    }
+
+    /**
+     *
+     * @returns {string} la couleur (hexadécimal) du rectangle
+     */
+    getColor(){
+        return this.#color;
+    }
+
+    /**
+     * @param {String} color la nouvelle couleur du rectangle
+     */
+    setColor(color){
+        this.#color = color;
     }
 
     /**
@@ -274,24 +293,27 @@ export class Text{
     /**
  * @return {Object} balise HTML <text> (clé) et attributs (valeur)
  */
-    getHtmlTag(){
+    getHtmlStructure(){
         const attr = {
             x: this.#corner.getX(),
             y: this.#corner.getY(),
+            fill: `#${this.#color}` // change couleur du texte
         };
-        return {"text": attr, "fragment" : this.#text};
+        return {"tag": "text",
+                "attributes": attr, 
+                "fragment" : this.#text};
     }
 
     toString(){
-        return `Text(${ this.#text }, ${ this.getCorner().getX() }, ${ this.getCorner().getY() })`;
+        return `Text(${ this.#text }, ${ this.#corner.getX() }, ${ this.#corner.getY() })`;
     }
 }
 
 // CRÉER LES ÉLÉMENTS HTML <circle>, <rectangle> et <text>
 
 /**
- * Dessine tous les cercles dans un svg.  Cette fonction
- * nettoye le svg avant d'ajouter les cercles.
+ * Dessine toutes les figures dans un svg.  Cette fonction
+ * nettoye le svg avant d'ajouter les figures.
  *
  * @param node {HTMLElement} un element svg
  * @param figures {Array[]} Les formes à dessiner
@@ -303,12 +325,12 @@ export function drawFigures(node, figures){
     let svgfig = [];
 
     for(const figure of figures){
-        let figTag = Object.keys(figure.getHtmlTag())[0];
-        let attr = Object.values(figure.getHtmlTag())[0];
-        let frag = Object.values(figure.getHtmlTag())[1];
+        let tag = Object.values(figure.getHtmlStructure())[0];
+        let attr = Object.values(figure.getHtmlStructure())[1];
+        let frag = Object.values(figure.getHtmlStructure())[2];
 
-        // ajouter une balise <cercle>, <rect> à la liste des enfants
-        svgfig.push(m(figTag, attr, frag));        
+        // ajouter une balise <cercle>, <rect> ou <text> à la liste des enfants
+        svgfig.push(m(tag, attr, frag));        
     }
 
     m.render(node, svgfig);
@@ -328,24 +350,31 @@ function functionOrDefault(fn){
     return identity;
 }
 
-function drawIcons(circle,
+function drawIcons(figure,
                    onClickUp,
                    onClickDown,
                    onClickLeft,
                    onClickRight,
-                   onClickPaint){
+                   onClickPaint,
+                   onClickPaintWithColor,
+                   onClickErase){
     return [
-        m("i.fa-solid.fa-arrow-up.is-clickable", {onclick: () => onClickUp(circle.getId())}),
-        m("i.fa-solid.fa-arrow-down.is-clickable", {onclick: () => onClickDown(circle.getId())}),
-        m("i.fa-solid.fa-arrow-left.is-clickable", {onclick: () => onClickLeft(circle.getId())}),
-        m("i.fa-solid.fa-arrow-right.is-clickable", {onclick: () => onClickRight(circle.getId())}),
-        m("i.fa-solid.fa-paint-roller.is-clickable", {onclick: () => onClickPaint(circle.getId())}),
-    ]
+        m("i.fa-solid.fa-arrow-up.is-clickable", {onclick: () => onClickUp(figure.getId())}),
+        m("i.fa-solid.fa-arrow-down.is-clickable", {onclick: () => onClickDown(figure.getId())}),
+        m("i.fa-solid.fa-arrow-left.is-clickable", {onclick: () => onClickLeft(figure.getId())}),
+        m("i.fa-solid.fa-arrow-right.is-clickable", {onclick: () => onClickRight(figure.getId())}),
+        m("i.fa-solid.fa-paint-roller.is-clickable", {onclick: () => onClickPaint(figure.getId())}),
+        m("i.fa-solid.fa-trash.is-clickable", {onclick: () => onClickErase(figure.getId())}),
+        m('input', {
+            type: "color",
+            onchange: e => { onClickPaintWithColor(figure.getId(), e.target.value) }
+        })]
+
 }
 
 /**
  * @param node {HTMLElement} un element tbody
- * @param circles {Circle[]} Les cercles
+ * @param figures {[]} Les figures géométriques
  * @param pointToString Argument optionnel qui doit être une fonction
  *        qui prend en paramêtre un Point et retourne un String qui
  *        représente le point.
@@ -371,22 +400,26 @@ function drawIcons(circle,
  *        la fonction.
  */
 export function populateTable(node,
-                              circles,
+                              figures,
                               onClickUp=undefined,
                               onClickDown=undefined,
                               onClickLeft=undefined,
                               onClickRight=undefined,
-                              onClickPaint=undefined){
+                              onClickPaint=undefined,
+                              onClickPaintWithColor=undefined,
+                              onClickErase){
     const rows = [];
-    for(const circle of circles){
-        const row =[m("td", circle.getId()),
-            m("td", circle.toString()),
-            m("td", drawIcons(circle,
+    for(const figure of figures){
+        const row =[m("td", figure.getId()),
+            m("td", figure.toString()),
+            m("td", drawIcons(figure,
                 functionOrDefault(onClickUp),
                 functionOrDefault(onClickDown),
                 functionOrDefault(onClickLeft),
                 functionOrDefault(onClickRight),
-                functionOrDefault(onClickPaint)))];
+                functionOrDefault(onClickPaint),
+                functionOrDefault(onClickPaintWithColor),
+                functionOrDefault(onClickErase)))];
         rows.push(m("tr", row))
     }
     m.render(node, rows);
