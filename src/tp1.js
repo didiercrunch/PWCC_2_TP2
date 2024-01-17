@@ -98,17 +98,17 @@ export class Circle{
     }
 
     /**
-     * @return {Object} balise HTML <circle> (clé) et attributs (valeur)
+     * @return {Object} Paramètres pour créer une vue Mithril.js (HTML Element)
      */
     getHtmlStructure(){
-        const attr = {
+        const attributes = {
             cx: this.#center.getX(),
             cy: this.#center.getY(),
             r:  this.#radius,
             fill: `#${this.#color}`,
         };
-        return {"tag": "circle",
-                "attributes" : attr};
+        return {"selector": "circle",
+                "attrs" : attributes};
     }
 
     toString(){
@@ -200,18 +200,18 @@ export class Rectangle{
     }
 
     /**
- * @return {Object} balise HTML <rect> (clé) et attributs (valeur)
+ * @return {Object} Paramètres pour créer une vue Mithril.js (HTML Element)
  */
     getHtmlStructure(){
-        const attr = {
+        const attributes = {
             x: this.#corner.getX(),
             y: this.#corner.getY(),
             width: this.#width,
             height: this.#height,
             fill: `#${this.#color}`,
         };
-        return {"tag": "rect",
-                "attributes": attr};
+        return {"selector": "rect",
+                "attrs": attributes};
     }
 
     toString(){
@@ -220,10 +220,8 @@ export class Rectangle{
 }
 
 /**
- * Classe qui représente une boîte de texte.  La boîte de texte est
- * définie par un Point, un texte et un id.
- *
- * Par défaut, la boîte texte est sans couleur de remplissage. 
+ * Classe qui représente un texte.  La boîte de texte est
+ * définie par un Point, un texte et un id. 
  */
 export class Text{
     #corner;
@@ -254,7 +252,7 @@ export class Text{
     }
 
     /**
-    * @param {Point} corner la nouvelle position du coin supérieur gauche du texte
+    * @param {Point} corner la nouvelle position du coin inférieur gauche du texte
     */
     setPosition(corner){
         this.#corner = corner;
@@ -262,14 +260,14 @@ export class Text{
 
     /**
      *
-     * @returns {string} la couleur (hexadécimal) du rectangle
+     * @returns {string} la couleur (hexadécimal) du texte
      */
     getColor(){
         return this.#color;
     }
 
     /**
-     * @param {String} color la nouvelle couleur du rectangle
+     * @param {String} color la nouvelle couleur du texte
      */
     setColor(color){
         this.#color = color;
@@ -291,17 +289,17 @@ export class Text{
     }
 
     /**
- * @return {Object} balise HTML <text> (clé) et attributs (valeur)
+ * @return {Object} Paramètres pour créer une vue Mithril.js (HTML Element)
  */
     getHtmlStructure(){
-        const attr = {
+        const attributes = {
             x: this.#corner.getX(),
             y: this.#corner.getY(),
             fill: `#${this.#color}` // change couleur du texte
         };
-        return {"tag": "text",
-                "attributes": attr, 
-                "fragment" : this.#text};
+        return {"selector": "text",
+                "attrs": attributes, 
+                "children" : this.#text};
     }
 
     toString(){
@@ -321,16 +319,16 @@ export class Text{
 export function drawFigures(node, figures){
     //console.log(figures.toString())
 
-    // Liste de vnodes à ajouter comme enfants au SVG (id='canvas')
+    // vnodes à ajouter comme enfants au SVG (id='canvas')
     let svgfig = [];
 
     for(const figure of figures){
-        let tag = Object.values(figure.getHtmlStructure())[0];
-        let attr = Object.values(figure.getHtmlStructure())[1];
-        let frag = Object.values(figure.getHtmlStructure())[2];
+        let selector = Object.values(figure.getHtmlStructure())[0];
+        let attrs = Object.values(figure.getHtmlStructure())[1];
+        let children = Object.values(figure.getHtmlStructure())[2];
 
-        // ajouter une balise <cercle>, <rect> ou <text> à la liste des enfants
-        svgfig.push(m(tag, attr, frag));        
+        // ajouter une balise <cercle>, <rect> ou <text> au SVG
+        svgfig.push(m(selector, attrs, children));        
     }
 
     m.render(node, svgfig);
@@ -357,47 +355,55 @@ function drawIcons(figure,
                    onClickRight,
                    onClickPaint,
                    onClickPaintWithColor,
-                   onClickErase){
+                   onClickRemove){
     return [
         m("i.fa-solid.fa-arrow-up.is-clickable", {onclick: () => onClickUp(figure.getId())}),
         m("i.fa-solid.fa-arrow-down.is-clickable", {onclick: () => onClickDown(figure.getId())}),
         m("i.fa-solid.fa-arrow-left.is-clickable", {onclick: () => onClickLeft(figure.getId())}),
         m("i.fa-solid.fa-arrow-right.is-clickable", {onclick: () => onClickRight(figure.getId())}),
         m("i.fa-solid.fa-paint-roller.is-clickable", {onclick: () => onClickPaint(figure.getId())}),
-        m("i.fa-solid.fa-trash.is-clickable", {onclick: () => onClickErase(figure.getId())}),
+        m("i.fa-solid.fa-trash.is-clickable", {onclick: () => onClickRemove(figure.getId())}),
         m('input', {
             type: "color",
-            onchange: e => { onClickPaintWithColor(figure.getId(), e.target.value) }
+            value:"",
+            onchange: (e) => { onClickPaintWithColor(figure.getId(), e.target.value) }
         })]
 
 }
 
 /**
  * @param node {HTMLElement} un element tbody
- * @param figures {[]} Les figures géométriques
+ * @param figures {Array[]} Les formes géométriques
  * @param pointToString Argument optionnel qui doit être une fonction
  *        qui prend en paramêtre un Point et retourne un String qui
  *        représente le point.
  * @param onClickUp Argument optionnel qui doit être une fonction
  *        qui sera appelée lorsque la flèche pointant vers le haut
- *        sera cliquée.  L'id du cercle sera passé en argument de
+ *        sera cliquée.  L'id de la forme sera passé en argument de
  *        la fonction.
  * @param onClickDown Argument optionnel qui doit être une fonction
  *        qui sera appelée lorsque la flèche pointant vers le bas
- *        sera cliquée.  L'id du cercle sera passé en argument de
+ *        sera cliquée.  L'id de la forme sera passé en argument de
  *        la fonction.
  * @param onClickLeft Argument optionnel qui doit être une fonction
  *        qui sera appelée lorsque la flèche pointant vers la gauche
- *        sera cliquée.  L'id du cercle sera passé en argument de
+ *        sera cliquée.  L'id de la forme sera passé en argument de
  *        la fonction.
  * @param onClickRight Argument optionnel qui doit être une fonction
  *        qui sera appelée lorsque la flèche pointant vers la droite
- *        sera cliquée.  L'id du cercle sera passé en argument de
+ *        sera cliquée.  L'id de la forme sera passé en argument de
  *        la fonction.
  * @param onClickPaint Argument optionnel qui doit être une fonction
  *        qui sera appelée lorsque l'icone peinture
- *        sera cliquée.  L'id du cercle sera passé en argument de
+ *        sera cliquée.  L'id de la forme sera passé en argument de
  *        la fonction.
+ * @param onClickPaintWithColor Argument optionnel qui doit être une fonction
+ *        qui sera appelée lorsque le color picker sera sélectionné par clic
+ *        de la souris. L'id de la forme et la couleur sélectionnée sont passés 
+ *        comme arguments à la fonction.
+ * @param onClickRemove Argument optionnel qui doit être une fonction 
+ *        qui sera appelée lorsque l'icone de la poubelle sera cliqué. L'id
+ *        de la forme sera passé comme argument de la fonction.
  */
 export function populateTable(node,
                               figures,
@@ -407,7 +413,7 @@ export function populateTable(node,
                               onClickRight=undefined,
                               onClickPaint=undefined,
                               onClickPaintWithColor=undefined,
-                              onClickErase){
+                              onClickRemove=undefined){
     const rows = [];
     for(const figure of figures){
         const row =[m("td", figure.getId()),
@@ -419,7 +425,7 @@ export function populateTable(node,
                 functionOrDefault(onClickRight),
                 functionOrDefault(onClickPaint),
                 functionOrDefault(onClickPaintWithColor),
-                functionOrDefault(onClickErase)))];
+                functionOrDefault(onClickRemove)))];
         rows.push(m("tr", row))
     }
     m.render(node, rows);
