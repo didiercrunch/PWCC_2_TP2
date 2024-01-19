@@ -1,5 +1,5 @@
 import m from "https://esm.sh/mithril@2.2.2"
-
+// didier: test
 const BLACK = "000000";
 
 // LES CLASSES: Point, Circle, Rectangle, Text
